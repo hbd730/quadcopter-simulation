@@ -18,7 +18,7 @@ python runsim.py
 
 Future Work
 -----
-I am not sure how long I will be actively maintain the tool for, however, here is my current plan:
+Here is my current plan:
 
 * Add state history plots.
 * Develop a helix or way points trajectory.
