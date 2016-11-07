@@ -2,7 +2,7 @@
 
 The project simulates a quadcopter in 3D environment. It contains a basic quadcopter dynamcis model, hover controller, trajectory generator, visulization toolkit and a top level scheduler which runs each module at a specific rate. 
 
-![alt tag](https://github.com/hbd730/quadcopter/master/sim.gif)
+![alt tag](https://github.com/hbd730/quadcopter-simulation/blob/master/sim.gif)
 
 Motivation
 -----
@@ -20,11 +20,9 @@ Future Work
 -----
 I am not sure how long I will be actively maintain the tool for, however, here is my current plan:
 
-1. Add state history plots.
-
-2. Develop a helix or way points trajectory.
-
-3. Kalman filter based sensor fusion: height estimation by accelerometer and barometer.
+* Add state history plots.
+* Develop a helix or way points trajectory.
+* Kalman filter based sensor fusion: height estimation by accelerometer and barometer.
 
 Contribution
 -----
@@ -34,4 +32,4 @@ Contact
 -----
 Peter Huang
 
-Email:hbd730@gmail.com
+Email: hbd730@gmail.com
