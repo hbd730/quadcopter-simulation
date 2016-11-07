@@ -19,8 +19,8 @@ python runsim.py
 Future Work
 -----
 I am not sure how long I will be actively maintain the tool for, however, here is my current plan:
-1. Testing controller's actual run frequency.
-2. Develop a helix or way points trajectory
+1. Add state history plots.
+2. Develop a helix or way points trajectory.
 3. Kalman filter based sensor fusion: height estimation by accelerometer and barometer.
 
 Contribution
