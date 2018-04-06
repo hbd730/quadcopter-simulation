@@ -2,7 +2,8 @@ import numpy as np
 from collections import namedtuple
 
 def generate_trajectory(t, waypoints):
-"   The function takes known number of waypoints and time, then generates a
+"   
+    The function takes known number of waypoints and time, then generates a
     minimum snap trajectory which goes through each waypoint. The output is
     the desired state associated with the next waypont for the time t.  
 "
@@ -17,9 +18,35 @@ def generate_trajectory(t, waypoints):
     return  DesiredState(pos, vel, acc, yaw, yawdot)
 
 
-# Minimum Snap trajectory
-def MST(waypoints):
+def get_poly_cc(n, k, t):
+"   
+    This is a helper function to get the coeffitient of coefficient for n-th
+    order polynomial with k-th derivative at time t.
 "
+    assert (n > 0 and k > 0), "order and derivative must be positive."
+    
+    cc = np.ones(n)
+    D  = np.linspace(1, n, n)
+    
+    for i in n:
+        for j in k:
+            if D[i] < 0:
+                D[i] = 0
+
+            D[i] = D[i] - 1
+            cc[i] = cc[i] * D[i]
+        
+    for i in len(cc):
+        cc[i] = cc[i] * np.power(t, D[i])
+    
+    return cc
+
+# Minimum Snap trajectory
+def MST(waypoints, t):
+"   
+    This function takes a list of desired waypoint i.e. [x0, x1, x2...xN] and
+    time, returns a [8N,1] coeffitients matrix for the N+1 waypoints.  
+
     1.The Problem
     Generate a full trajectory across N+1 waypoint is made of N polynomial line segment.
     Each segment is defined as 7 order polynomial defined as follow:
@@ -41,7 +68,7 @@ def MST(waypoints):
     A * Coeff = B
     
     Let's look at B matrix first, B matrix is simple because it is just some constants 
-    on the right hand side of the equation. There are 8xN constrains, 
+    on the right hand side of the equation. There are 8xN constraints, 
     so B matrix will be [8N, 1].
 
     Now, how do we determine the dimension of Coeff matrix? Coeff is the final
@@ -60,24 +87,26 @@ def MST(waypoints):
         ]
 
     Each element in a row represents the coefficient of coeffient aij under
-    a certain constrain, where aij is the jth coeffient of Pi with i = 1...N, j = 0...7. 
+    a certain constraint, where aij is the jth coeffient of Pi with i = 1...N, j = 0...7. 
 
     4. Output
     Coeff = B * A.inverse()
 "
 
-
-
-
-
-
-
-
-
-
+    N = len(waypoints) - 1
     
+    # initialize A, and B matrix
+    A = np.zeros(8*N, 8*N)
+    B = np.zeros(8*N, 1)
+
+    # populate B matrix.
 
 
+    # Constraint 1
+
+
+    Coeff = B * A.inverse()
+    return Coeff
 
 
 
