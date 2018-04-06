@@ -37,3 +37,4 @@ def genLine(t):
     DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
+
