@@ -4,9 +4,8 @@ from collections import namedtuple
 DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
 
 def get_helix_waypoints(t, n):
-"""
-    The function generate n helix waypoints from the given time t
-"""
+    """ The function generate n helix waypoints from the given time t
+    """
     waypoints_t = np.linspace(t, t + 2*np.pi, n)
     x = np.sin(waypoints_t)
     y = np.cos(waypoints_t)
@@ -16,32 +15,31 @@ def get_helix_waypoints(t, n):
 
 
 def generate_trajectory(t, v, waypoints):
-"""
-    The function takes known number of waypoints and time, then generates a
+    """ The function takes known number of waypoints and time, then generates a
     minimum snap trajectory which goes through each waypoint. The output is
     the desired state associated with the next waypont for the time t.
     waypoints is [N,3] matrix, waypoints = [[x0,y0,z0]...[xn,yn,zn]].
     v is velocity in m/s
-"""
+    """
     yaw = 0.0;
     yawdot = 0.0;
     pos = np.zeros(3)
     acc = np.zeros(3)
     vel = np.zeros(3)
-   
-    # distance vector array, represents each segment's distance 
+
+    # distance vector array, represents each segment's distance
     distance = waypoints[0:-1] - waypoints[1:]
     # T is now each segment's travel time
-    T = (1.0 / v) * np.sqrt(distance(:,0)**2 + distance(:,1)**2 + distance(:,2)**2)
+    T = (1.0 / v) * np.sqrt(distance[:,0]**2 + distance[:,1]**2 + distance[:,2]**2)
     # accumulated time
     S = np.cumsum(T)
-   
+
     # generate MST coefficients for each segment
     coeff_x = MST(waypoints[:,0], t)
     coeff_y = MST(waypoints[:,1], t)
     coeff_z = MST(waypoints[:,2], t)
-    
-    # prepare desired state 
+
+    # prepare desired state
     if t > S[-1]:
         t = S[-1]
 
@@ -52,7 +50,7 @@ def generate_trajectory(t, v, waypoints):
         pos = waypoint[0]
         vel = 0
         acc = 0
-    else
+    else:
         # scaled time
         scale = (t - S[t_index]) / T(t_index)
 
@@ -61,7 +59,7 @@ def generate_trajectory(t, v, waypoints):
 
         t0 = get_poly_cc(8, 0, scale)
         pos = np.array([coeff_x[start:end]*t0, coeff_y[start:end]*t0, coeff_z[start:end]*t0])
-        
+
         t1 = get_poly_cc(8, 1, scale)
         # chain rule applied
         vel = np.array([coeff_x[start:end]*t1, coeff_y[start:end]*t1, coeff_z[start:end]*t1]) * (1.0 / T(t_index))
@@ -74,10 +72,9 @@ def generate_trajectory(t, v, waypoints):
 
 
 def get_poly_cc(n, k, t):
-"""
-    This is a helper function to get the coeffitient of coefficient for n-th
-    order polynomial with k-th derivative at time t.
-"""
+    """ This is a helper function to get the coeffitient of coefficient for n-th
+        order polynomial with k-th derivative at time t.
+    """
     assert (n > 0 and k > 0), "order and derivative must be positive."
 
     cc = np.ones(n)
@@ -97,8 +94,7 @@ def get_poly_cc(n, k, t):
 
 # Minimum Snap Trajectory
 def MST(waypoints, t):
-"""
-    This function takes a list of desired waypoint i.e. [x0, x1, x2...xN] and
+    """ This function takes a list of desired waypoint i.e. [x0, x1, x2...xN] and
     time, returns a [8N,1] coeffitients matrix for the N+1 waypoints.
 
     1.The Problem
@@ -145,13 +141,13 @@ def MST(waypoints, t):
 
     4. Output
     Coeff = B * A.inverse()
-"""
+    """
 
     n = len(waypoints) - 1
 
     # initialize A, and B matrix
-    A = np.zeros(8*N, 8*N)
-    B = np.zeros(8*N, 1)
+    A = np.zeros((8*N, 8*N))
+    B = np.zeros((8*N, 1))
 
     # populate B matrix.
     for i in n:
