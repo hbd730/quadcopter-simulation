@@ -1,21 +1,76 @@
 import numpy as np
 from collections import namedtuple
 
-def generate_trajectory(t, waypoints):
+DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
+
+def get_helix_waypoints(t, n):
+"""
+    The function generate n helix waypoints from the given time t
+"""
+    waypoints_t = np.linspace(t, t + 2*np.pi, n)
+    x = np.sin(waypoints_t)
+    y = np.cos(waypoints_t)
+    z = waypoints_t
+
+    return np.stack((x, y, z), axis=-1)
+
+
+def generate_trajectory(t, v, waypoints):
 """
     The function takes known number of waypoints and time, then generates a
     minimum snap trajectory which goes through each waypoint. The output is
     the desired state associated with the next waypont for the time t.
+    waypoints is [N,3] matrix, waypoints = [[x0,y0,z0]...[xn,yn,zn]].
+    v is velocity in m/s
 """
     yaw = 0.0;
     yawdot = 0.0;
     pos = np.zeros(3)
     acc = np.zeros(3)
     vel = np.zeros(3)
+   
+    # distance vector array, represents each segment's distance 
+    distance = waypoints[0:-1] - waypoints[1:]
+    # T is now each segment's travel time
+    T = (1.0 / v) * np.sqrt(distance(:,0)**2 + distance(:,1)**2 + distance(:,2)**2)
+    # accumulated time
+    S = np.cumsum(T)
+   
+    # generate MST coefficients for each segment
+    coeff_x = MST(waypoints[:,0], t)
+    coeff_y = MST(waypoints[:,1], t)
+    coeff_z = MST(waypoints[:,2], t)
+    
+    # prepare desired state 
+    if t > S[-1]:
+        t = S[-1]
 
+    # find which segment current t belongs to
+    t_index = np.where(t >= S)[0]
 
-    DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
-    return  DesiredState(pos, vel, acc, yaw, yawdot)
+    if t_index == 0:
+        pos = waypoint[0]
+        vel = 0
+        acc = 0
+    else
+        # scaled time
+        scale = (t - S[t_index]) / T(t_index)
+
+        start = 8 * t_index
+        end = 8 * (t_index + 1)
+
+        t0 = get_poly_cc(8, 0, scale)
+        pos = np.array([coeff_x[start:end]*t0, coeff_y[start:end]*t0, coeff_z[start:end]*t0])
+        
+        t1 = get_poly_cc(8, 1, scale)
+        # chain rule applied
+        vel = np.array([coeff_x[start:end]*t1, coeff_y[start:end]*t1, coeff_z[start:end]*t1]) * (1.0 / T(t_index))
+
+        t2 = get_poly_cc(8, 2, scale)
+        # chain rule applied
+        acc = np.array([coeff_x[start:end]*t2, coeff_y[start:end]*t2, coeff_z[start:end]*t2]) * (1.0 / T(t_index)**2)
+
+    return DesiredState(pos, vel, acc, yaw, yawdot)
 
 
 def get_poly_cc(n, k, t):
