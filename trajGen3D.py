@@ -95,7 +95,7 @@ def get_poly_cc(n, k, t):
 
     return cc
 
-# Minimum Snap trajectory
+# Minimum Snap Trajectory
 def MST(waypoints, t):
 """
     This function takes a list of desired waypoint i.e. [x0, x1, x2...xN] and
@@ -147,20 +147,38 @@ def MST(waypoints, t):
     Coeff = B * A.inverse()
 """
 
-    N = len(waypoints) - 1
+    n = len(waypoints) - 1
 
     # initialize A, and B matrix
     A = np.zeros(8*N, 8*N)
     B = np.zeros(8*N, 1)
 
     # populate B matrix.
-    for i in N:
+    for i in n:
         B[i] = waypoints[i]
-        B[i + N] = waypoints[i+1]
+        B[i + n] = waypoints[i+1]
 
     # Constraint 1
-    for i in N:
-        A[i][8*i:8*(i+1)] = get_poly_cc(8, 0, t)
+    for i in n:
+        A[i][8*i:8*(i+1)] = get_poly_cc(8, 0, 0)
 
+    # Constraint 2
+    for i in n:
+        A[i+n][8*i:8*(i+1)] = get_poly_cc(8, 0, 1)
+
+    # Constraint 3
+    for k in 3:
+        A[2*n+k][:8] = get_poly_cc(8, k, 0)
+
+    # Constraint 4
+    for k in 3:
+        A[2*n+3+k][-8:] = get_poly_cc(8, k, 1)
+
+    # Constraint 5
+    for i in n-1:
+        for k in 6:
+            A[2*n+6 + (i-1)*6+k][(i-1)*8 : ((i-1)*8 + 15)] = np.concatenate((get_poly_cc(8, k, 1),-get_poly_cc(8, k, 0)), 1)
+
+    # solve for the coefficients
     Coeff = B * A.inverse()
     return Coeff
