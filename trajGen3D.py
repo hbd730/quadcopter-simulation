@@ -71,7 +71,6 @@ def generate_trajectory(t, v, waypoints):
 
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
-
 def get_poly_cc(n, k, t):
     """ This is a helper function to get the coeffitient of coefficient for n-th
         order polynomial with k-th derivative at time t.
@@ -160,7 +159,7 @@ def MST(waypoints, t):
     for i in range(n):
         A[i+n][8*i:8*(i+1)] = get_poly_cc(8, 0, 1)
 
-    # # Constraint 3
+    # Constraint 3
     for k in range(1, 4):
         A[2*n+k-1][:8] = get_poly_cc(8, k, 0)
 
