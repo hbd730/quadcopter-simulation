@@ -80,10 +80,7 @@ class TestMST(unittest.TestCase):
         t = 0
         n = 8
         waypoints = trajGen3D.get_helix_waypoints(t, n)
-        print waypoints[:,0]
-        np.savetxt('waypoint_x.out', waypoints[:,0], delimiter=',')
         C = trajGen3D.MST(waypoints[:,0], t)
-        np.savetxt('C.out', C, delimiter=',', fmt='%6.3f')
         self.assertEqual(C.shape, (8*(n-1), 1))
 
 if __name__ == '__main__':

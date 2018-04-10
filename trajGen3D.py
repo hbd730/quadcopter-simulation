@@ -162,21 +162,17 @@ def MST(waypoints, t):
 
     # # Constraint 3
     for k in range(1, 4):
-        A[2*n+k][:8] = get_poly_cc(8, k, 0)
+        A[2*n+k-1][:8] = get_poly_cc(8, k, 0)
 
     # Constraint 4
     for k in range(1, 4):
-        A[2*n+3+k][-8:] = get_poly_cc(8, k, 1)
+        A[2*n+3+k-1][-8:] = get_poly_cc(8, k, 1)
 
     # Constraint 5
     for i in range(n-1):
         for k in range(1, 7):
             A[2*n+6 + i*6+k-1][i*8 : (i*8+16)] = np.concatenate((get_poly_cc(8, k, 1), -get_poly_cc(8, k, 0)))
 
-    print "A", A
-    np.savetxt('A.out', A, delimiter=' ,', fmt='%6.3f')
-    np.savetxt('B.out', B, delimiter=' ,', fmt='%1.3f')
-
     # solve for the coefficients
-    Coeff = np.linalg.lstsq(A, B)[0]
+    Coeff = np.linalg.solve(A, B)
     return Coeff
