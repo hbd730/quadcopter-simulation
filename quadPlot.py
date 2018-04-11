@@ -5,7 +5,8 @@ import matplotlib.animation as animation
 import numpy as np
 import sys
 
-# TODO add functionality for plotting state and desired_state
+history = np.zeros((500,3))
+count = 0
 
 def plot_quad_3d(args=()):
     fig = plt.figure()
@@ -13,6 +14,7 @@ def plot_quad_3d(args=()):
     ax.plot([], [], [], '-', c='cyan')[0]
     ax.plot([], [], [], '-', c='red')[0]
     ax.plot([], [], [], '-', c='blue', marker='o', markevery=2)[0]
+#ax.plot([], [], [], '.', c='blue', markersize=1)[0]
     set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,5))
     an = animation.FuncAnimation(fig, _callback, fargs = args, init_func=None,
             frames=400, interval=10, blit=False)
@@ -37,6 +39,15 @@ def set_frame(frame):
         line.set_data(x, y)
         line.set_3d_properties(z)
 
+    global history, count
+    # plot history trajectory
+    history[count] = frame[:,4]
+    if count < np.size(history, 0):
+        count += 1
+    zline = history[:count,-1]
+    xline = history[:count,0]
+    yline = history[:count,1]
+    ax.plot3D(xline, yline, zline, 'blue')
 
 def _callback(i, sched, id):
     # forward the event from GUI thread to scheduler threadA
