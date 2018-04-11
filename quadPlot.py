@@ -37,11 +37,10 @@ def set_frame(frame):
         line.set_data(x, y)
         line.set_3d_properties(z)
 
+
 def _callback(i, sched, id):
     # forward the event from GUI thread to scheduler threadA
     # do the actual rendering in _render method
     # start scheduler after we get the first frame so that we can see the initial state
     sched.start()
     sched.postEvent(id)
-
-

@@ -9,8 +9,8 @@ def get_helix_waypoints(t, n):
         output waypoints shape is [n, 3]
     """
     waypoints_t = np.linspace(t, t + 2*np.pi, n)
-    x = np.sin(waypoints_t)
-    y = np.cos(waypoints_t)
+    x = 0.5*np.cos(waypoints_t)
+    y = 0.5*np.sin(waypoints_t)
     z = waypoints_t
 
     return np.stack((x, y, z), axis=-1)
@@ -37,28 +37,28 @@ def generate_trajectory(t, v, waypoints):
     S[1:] = np.cumsum(T)
 
     # generate MST coefficients for each segmen, coeff is now 1D array [64,]
+    # TODO optimize here, no need to run MST every time
     coeff_x = MST(waypoints[:,0], t).transpose()[0]
     coeff_y = MST(waypoints[:,1], t).transpose()[0]
     coeff_z = MST(waypoints[:,2], t).transpose()[0]
-
-    # stay hover at the last waypoint position
-    if t > S[-1]:
-        return DesiredState(waypoints[-1], 0, 0, 0, 0)
 
     # find which segment current t belongs to
     t_index = np.where(t >= S)[0][-1]
 
     # prepare the next desired state
-    if t_index == 0:
+    if t == 0:
         pos = waypoints[0]
-        vel = 0
-        acc = 0
+    # stay hover at the last waypoint position
+    elif t > S[-1]:
+        pos = waypoints[-1]
     else:
         # scaled time
         scale = (t - S[t_index]) / T[t_index]
-
         start = 8 * t_index
         end = 8 * (t_index + 1)
+        # print "S", S
+        # print "scale ", scale
+        # print "start", start, "end", end
 
         t0 = get_poly_cc(8, 0, scale)
         pos = np.array([coeff_x[start:end].dot(t0), coeff_y[start:end].dot(t0), coeff_z[start:end].dot(t0)])

@@ -18,7 +18,7 @@ class TestGetHelixWaypoints(unittest.TestCase):
         expected = np.zeros((n,3))
 
         for i, t in enumerate(T):
-            expected[i] = np.array([np.sin(t),np.cos(t),t])
+            expected[i] = np.array([np.cos(t),np.sin(t),t])
 
         waypoints = trajGen3D.get_helix_waypoints(start_t, n)
         np.testing.assert_array_equal(waypoints, expected)
@@ -85,14 +85,15 @@ class TestMST(unittest.TestCase):
 
 class TestGenerateTrajectory(unittest.TestCase):
     def test_desired_state_size(self):
-        t = 5
+        t = 0
         n = 9
-        v = 0.5 # m/s
+        v = 0.1 # m/s
         waypoints = trajGen3D.get_helix_waypoints(t, n)
-        desired_state = trajGen3D.generate_trajectory(t, v, waypoints)
+        desired_state = trajGen3D.generate_trajectory(1.3, v, waypoints)
         self.assertEqual(desired_state.pos.shape, (3,))
         self.assertEqual(desired_state.vel.shape, (3,))
         self.assertEqual(desired_state.acc.shape, (3,))
+        des_x_dot, des_y_dot, des_z_dot = desired_state.vel
         print "desired_state", desired_state
 
 if __name__ == '__main__':
