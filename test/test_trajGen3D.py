@@ -83,5 +83,17 @@ class TestMST(unittest.TestCase):
         C = trajGen3D.MST(waypoints[:,0], t)
         self.assertEqual(C.shape, (8*(n-1), 1))
 
+class TestGenerateTrajectory(unittest.TestCase):
+    def test_desired_state_size(self):
+        t = 5
+        n = 9
+        v = 0.5 # m/s
+        waypoints = trajGen3D.get_helix_waypoints(t, n)
+        desired_state = trajGen3D.generate_trajectory(t, v, waypoints)
+        self.assertEqual(desired_state.pos.shape, (3,))
+        self.assertEqual(desired_state.vel.shape, (3,))
+        self.assertEqual(desired_state.acc.shape, (3,))
+        print "desired_state", desired_state
+
 if __name__ == '__main__':
     unittest.main()

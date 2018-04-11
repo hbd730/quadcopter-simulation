@@ -22,8 +22,8 @@ def generate_trajectory(t, v, waypoints):
     waypoints is [N,3] matrix, waypoints = [[x0,y0,z0]...[xn,yn,zn]].
     v is velocity in m/s
     """
-    yaw = 0.0;
-    yawdot = 0.0;
+    yaw = 0.0
+    yawdot = 0.0
     pos = np.zeros(3)
     acc = np.zeros(3)
     vel = np.zeros(3)
@@ -33,41 +33,43 @@ def generate_trajectory(t, v, waypoints):
     # T is now each segment's travel time
     T = (1.0 / v) * np.sqrt(distance[:,0]**2 + distance[:,1]**2 + distance[:,2]**2)
     # accumulated time
-    S = np.cumsum(T)
+    S = np.zeros(len(T) + 1)
+    S[1:] = np.cumsum(T)
 
-    # generate MST coefficients for each segment
-    coeff_x = MST(waypoints[:,0], t)
-    coeff_y = MST(waypoints[:,1], t)
-    coeff_z = MST(waypoints[:,2], t)
+    # generate MST coefficients for each segmen, coeff is now 1D array [64,]
+    coeff_x = MST(waypoints[:,0], t).transpose()[0]
+    coeff_y = MST(waypoints[:,1], t).transpose()[0]
+    coeff_z = MST(waypoints[:,2], t).transpose()[0]
 
-    # prepare desired state
+    # stay hover at the last waypoint position
     if t > S[-1]:
-        t = S[-1]
+        return DesiredState(waypoints[-1], 0, 0, 0, 0)
 
     # find which segment current t belongs to
-    t_index = np.where(t >= S)[0]
+    t_index = np.where(t >= S)[0][-1]
 
+    # prepare the next desired state
     if t_index == 0:
-        pos = waypoint[0]
+        pos = waypoints[0]
         vel = 0
         acc = 0
     else:
         # scaled time
-        scale = (t - S[t_index]) / T(t_index)
+        scale = (t - S[t_index]) / T[t_index]
 
         start = 8 * t_index
         end = 8 * (t_index + 1)
 
         t0 = get_poly_cc(8, 0, scale)
-        pos = np.array([coeff_x[start:end]*t0, coeff_y[start:end]*t0, coeff_z[start:end]*t0])
+        pos = np.array([coeff_x[start:end].dot(t0), coeff_y[start:end].dot(t0), coeff_z[start:end].dot(t0)])
 
         t1 = get_poly_cc(8, 1, scale)
         # chain rule applied
-        vel = np.array([coeff_x[start:end]*t1, coeff_y[start:end]*t1, coeff_z[start:end]*t1]) * (1.0 / T(t_index))
+        vel = np.array([coeff_x[start:end].dot(t1), coeff_y[start:end].dot(t1), coeff_z[start:end].dot(t1)]) * (1.0 / T[t_index])
 
         t2 = get_poly_cc(8, 2, scale)
         # chain rule applied
-        acc = np.array([coeff_x[start:end]*t2, coeff_y[start:end]*t2, coeff_z[start:end]*t2]) * (1.0 / T(t_index)**2)
+        acc = np.array([coeff_x[start:end].dot(t2), coeff_y[start:end].dot(t2), coeff_z[start:end].dot(t2)]) * (1.0 / T[t_index]**2)
 
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
