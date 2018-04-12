@@ -15,14 +15,16 @@ import sys
 history = np.zeros((500,3))
 count = 0
 
-def plot_quad_3d(args=()):
+def plot_quad_3d(waypoints, args=()):
     fig = plt.figure()
     ax = fig.add_axes([0, 0, 1, 1], projection='3d')
     ax.plot([], [], [], '-', c='cyan')[0]
     ax.plot([], [], [], '-', c='red')[0]
     ax.plot([], [], [], '-', c='blue', marker='o', markevery=2)[0]
+    ax.plot([], [], [], '.', c='red', markersize=4)[0]
     ax.plot([], [], [], '.', c='blue', markersize=2)[0]
     set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,8))
+    plot_waypoints(waypoints)
     an = animation.FuncAnimation(fig, _callback, fargs = args, init_func=None,
             frames=400, interval=10, blit=False)
     if len(sys.argv) > 1 and sys.argv[1] == 'save':
@@ -30,6 +32,12 @@ def plot_quad_3d(args=()):
         an.save('sim.gif', dpi=80, writer='imagemagick', fps=60)
     else:
         plt.show()
+
+def plot_waypoints(waypoints):
+    ax = plt.gca()
+    lines = ax.get_lines()
+    lines[-2].set_data(waypoints[:,0], waypoints[:,1])
+    lines[-2].set_3d_properties(waypoints[:,2])
 
 def set_limit(x, y, z):
     ax = plt.gca()

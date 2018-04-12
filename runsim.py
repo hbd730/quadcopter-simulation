@@ -37,7 +37,7 @@ def main():
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
     sched.add_task(attitudeControl, dt, (quadcopter,time,waypoints,coeff_x,coeff_y,coeff_z))
     kEvent_Render = sched.add_event(render, (quadcopter,))
-    plt.plot_quad_3d((sched, kEvent_Render))
+    plt.plot_quad_3d(waypoints, (sched, kEvent_Render))
     try:
         while True:
             thread_time.sleep(5)
