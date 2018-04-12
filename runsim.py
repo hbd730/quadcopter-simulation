@@ -22,8 +22,8 @@ def render(quad):
     frame = quad.world_frame()
     plt.set_frame(frame)
 
-def attitudeControl(quad, time, waypoints):
-    desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints)
+def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
+    desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
     F, M = controller.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
@@ -34,7 +34,8 @@ def main():
     quadcopter = Quadcopter(pos, attitude)
     sched = scheduler.Scheduler()
     waypoints = trajGen3D.get_helix_waypoints(0, 9)
-    sched.add_task(attitudeControl, dt, (quadcopter,time,waypoints))
+    (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
+    sched.add_task(attitudeControl, dt, (quadcopter,time,waypoints,coeff_x,coeff_y,coeff_z))
     kEvent_Render = sched.add_event(render, (quadcopter,))
     plt.plot_quad_3d((sched, kEvent_Render))
     try:

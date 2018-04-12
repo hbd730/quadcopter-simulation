@@ -1,3 +1,10 @@
+"""
+author: Peter Huang
+email: hbd730@gmail.com
+license: BSD
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
+
 import numpy as np
 from collections import namedtuple
 
@@ -23,18 +30,16 @@ def genLine(t):
         dt = t - v_max / a_max
         vel[2] = v_max
         pos = np.array([0, 0, v_max**2 / (2 * a_max)]) + np.array([0, 0, v_max * dt])
-    # decelarate    
+    # decelarate
     elif t <= 3 * v_max / a_max:
         dt = t - 2 * v_max / a_max
         acc[2] = -a_max
         vel = np.array([0, 0, v_max]) + acc * dt
         pos = np.array([0, 0, 3 * v_max**2 / (2 * a_max)]) + np.array([0, 0, v_max]) * dt + 0.5 * acc * dt**2
-    # hover 
+    # hover
     else:
         pos = np.array([0, 0, 2 * v_max**2 / a_max])
-    
+
     pos += initial_pos
     DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
     return DesiredState(pos, vel, acc, yaw, yawdot)
-
-

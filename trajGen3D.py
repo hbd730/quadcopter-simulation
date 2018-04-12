@@ -1,3 +1,10 @@
+"""
+author: Peter Huang
+email: hbd730@gmail.com
+license: BSD
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
+
 import numpy as np
 from numpy.linalg import inv
 from collections import namedtuple
@@ -15,7 +22,14 @@ def get_helix_waypoints(t, n):
 
     return np.stack((x, y, z), axis=-1)
 
-def generate_trajectory(t, v, waypoints):
+def get_MST_coefficients(waypoints):
+    # generate MST coefficients for each segment, coeff is now 1D array [64,]
+    coeff_x = MST(waypoints[:,0]).transpose()[0]
+    coeff_y = MST(waypoints[:,1]).transpose()[0]
+    coeff_z = MST(waypoints[:,2]).transpose()[0]
+    return (coeff_x, coeff_y, coeff_z)
+
+def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     """ The function takes known number of waypoints and time, then generates a
     minimum snap trajectory which goes through each waypoint. The output is
     the desired state associated with the next waypont for the time t.
@@ -36,12 +50,6 @@ def generate_trajectory(t, v, waypoints):
     S = np.zeros(len(T) + 1)
     S[1:] = np.cumsum(T)
 
-    # generate MST coefficients for each segmen, coeff is now 1D array [64,]
-    # TODO optimize here, no need to run MST every time
-    coeff_x = MST(waypoints[:,0], t).transpose()[0]
-    coeff_y = MST(waypoints[:,1], t).transpose()[0]
-    coeff_z = MST(waypoints[:,2], t).transpose()[0]
-
     # find which segment current t belongs to
     t_index = np.where(t >= S)[0][-1]
 
@@ -56,9 +64,6 @@ def generate_trajectory(t, v, waypoints):
         scale = (t - S[t_index]) / T[t_index]
         start = 8 * t_index
         end = 8 * (t_index + 1)
-        # print "S", S
-        # print "scale ", scale
-        # print "start", start, "end", end
 
         t0 = get_poly_cc(8, 0, scale)
         pos = np.array([coeff_x[start:end].dot(t0), coeff_y[start:end].dot(t0), coeff_z[start:end].dot(t0)])
@@ -95,7 +100,7 @@ def get_poly_cc(n, k, t):
     return cc
 
 # Minimum Snap Trajectory
-def MST(waypoints, t):
+def MST(waypoints):
     """ This function takes a list of desired waypoint i.e. [x0, x1, x2...xN] and
     time, returns a [8N,1] coeffitients matrix for the N+1 waypoints.
 

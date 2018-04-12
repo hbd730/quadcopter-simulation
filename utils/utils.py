@@ -1,3 +1,10 @@
+"""
+author: Peter Huang
+email: hbd730@gmail.com
+license: BSD
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
+
 import numpy as np
 from math import sin, cos, asin, atan2, sqrt
 
@@ -48,7 +55,7 @@ def RotToQuat(R):
         qx = (R[0,2] + R[2,0]) / S
         qy = (R[1,2] + R[2,1]) / S
         qz = 0.25 * S
-    
+
     q = np.sign(qw) * np.array([qw, qx, qy, qz])
     return q
 
@@ -56,12 +63,9 @@ def writeNpArrayToFile(data):
     with open('state.csv','a') as f:
         np.savetxt(f, data, newline=",", fmt='%.2f')
         f.write('\n')
-        
+
 def outputTraj(x,y,z):
     output = []
     output.append((x,y,z))
     with open('traj.out', 'w') as fp:
         fp.write('\n'.join('%s %s %s' % item for item in output))
-
-
-

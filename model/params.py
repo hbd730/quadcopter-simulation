@@ -1,3 +1,10 @@
+"""
+author: Peter Huang
+email: hbd730@gmail.com
+license: BSD
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
+
 import numpy as np
 
 mass = 0.18 # kg
@@ -17,8 +24,8 @@ km = 1.5e-9
 kf = 6.11e-8
 r = km / kf
 
-#  [ F  ]         [ F1 ] 
-#  | M1 |  = A *  | F2 | 
+#  [ F  ]         [ F1 ]
+#  | M1 |  = A *  | F2 |
 #  | M2 |         | F3 |
 #  [ M3 ]         [ F4 ]
 A = np.array([[ 1,  1,  1,  1],
@@ -34,4 +41,3 @@ body_frame = np.array([(L, 0, 0, 1),
                        (0, -L, 0, 1),
                        (0, 0, 0, 1),
                        (0, 0, H, 1)])
-

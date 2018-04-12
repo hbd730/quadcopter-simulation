@@ -1,3 +1,10 @@
+"""
+author: Peter Huang
+email: hbd730@gmail.com
+license: BSD
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
+
 import numpy as np
 import model.params as params
 from math import sin, cos

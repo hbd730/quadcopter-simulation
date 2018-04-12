@@ -1,3 +1,10 @@
+"""
+author: Peter Huang
+email: hbd730@gmail.com
+license: BSD
+Please feel free to use and modify this, but keep the above information. Thanks!
+"""
+
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colors import cnames
 import matplotlib.pyplot as plt
@@ -14,11 +21,12 @@ def plot_quad_3d(args=()):
     ax.plot([], [], [], '-', c='cyan')[0]
     ax.plot([], [], [], '-', c='red')[0]
     ax.plot([], [], [], '-', c='blue', marker='o', markevery=2)[0]
-#ax.plot([], [], [], '.', c='blue', markersize=1)[0]
-    set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,5))
+    ax.plot([], [], [], '.', c='blue', markersize=2)[0]
+    set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,8))
     an = animation.FuncAnimation(fig, _callback, fargs = args, init_func=None,
             frames=400, interval=10, blit=False)
     if len(sys.argv) > 1 and sys.argv[1] == 'save':
+        print "saving"
         an.save('sim.gif', dpi=80, writer='imagemagick', fps=60)
     else:
         plt.show()
@@ -34,7 +42,7 @@ def set_frame(frame):
     lines_data = [frame[:,[0,2]], frame[:,[1,3]], frame[:,[4,5]]]
     ax = plt.gca()
     lines = ax.get_lines()
-    for line, line_data in zip(lines, lines_data):
+    for line, line_data in zip(lines[:3], lines_data):
         x, y, z = line_data
         line.set_data(x, y)
         line.set_3d_properties(z)
@@ -42,12 +50,14 @@ def set_frame(frame):
     global history, count
     # plot history trajectory
     history[count] = frame[:,4]
-    if count < np.size(history, 0):
+    if count < np.size(history, 0) - 1:
         count += 1
     zline = history[:count,-1]
     xline = history[:count,0]
     yline = history[:count,1]
-    ax.plot3D(xline, yline, zline, 'blue')
+    lines[-1].set_data(xline, yline)
+    lines[-1].set_3d_properties(zline)
+    # ax.plot3D(xline, yline, zline, 'blue')
 
 def _callback(i, sched, id):
     # forward the event from GUI thread to scheduler threadA
