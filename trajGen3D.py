@@ -12,7 +12,7 @@ from numpy import linalg as LA
 
 DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
 yaw = 0.0
-current_heading_v = np.zeros(2)
+current_heading = np.zeros(2)
 
 def get_helix_waypoints(t, n):
     """ The function generate n helix waypoints from the given time t
@@ -82,21 +82,25 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         # chain rule applied
         acc = np.array([coeff_x[start:end].dot(t2), coeff_y[start:end].dot(t2), coeff_z[start:end].dot(t2)]) * (1.0 / T[t_index]**2)
 
-        # desired yaw not working yet
+        # calculate desired yaw and yaw rate
         next_heading = np.array([vel[0], vel[1]])
+        # angle between current vector with the next heading vector
         delta_psi = np.arccos(np.dot(current_heading, next_heading) / (LA.norm(current_heading)*LA.norm(next_heading)))
+        # cross product allow us to determine rotating direction
         norm_v = np.cross(current_heading,next_heading)
+
         if norm_v > 0:
             yaw += delta_psi
         else:
             yaw -= delta_psi
 
+        # dirty hack, quadcopter's yaw range represented by quaternion is [-pi, pi]
         if yaw > np.pi:
             yaw = yaw - 2*np.pi
 
         # print next_heading, current_heading, "yaw", yaw*180/np.pi, 'pos', pos
         current_heading = next_heading
-        yawdot = delta_psi / 0.005
+        yawdot = delta_psi / 0.005 # dt is control period
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
 def get_poly_cc(n, k, t):
