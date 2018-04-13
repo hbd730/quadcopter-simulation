@@ -8,8 +8,11 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import numpy as np
 from numpy.linalg import inv
 from collections import namedtuple
+from numpy import linalg as LA
 
 DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
+yaw = 0.0
+current_heading_v = np.zeros(2)
 
 def get_helix_waypoints(t, n):
     """ The function generate n helix waypoints from the given time t
@@ -36,7 +39,8 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     waypoints is [N,3] matrix, waypoints = [[x0,y0,z0]...[xn,yn,zn]].
     v is velocity in m/s
     """
-    yaw = 0.0
+    global yaw
+    global current_heading
     yawdot = 0.0
     pos = np.zeros(3)
     acc = np.zeros(3)
@@ -56,6 +60,8 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     # prepare the next desired state
     if t == 0:
         pos = waypoints[0]
+        t0 = get_poly_cc(8, 1, 0)
+        current_heading = np.array([coeff_x[0:8].dot(t0), coeff_y[0:8].dot(t0)]) * (1.0 / T[0])
     # stay hover at the last waypoint position
     elif t > S[-1]:
         pos = waypoints[-1]
@@ -76,6 +82,21 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         # chain rule applied
         acc = np.array([coeff_x[start:end].dot(t2), coeff_y[start:end].dot(t2), coeff_z[start:end].dot(t2)]) * (1.0 / T[t_index]**2)
 
+        # desired yaw not working yet
+        next_heading = np.array([vel[0], vel[1]])
+        delta_psi = np.arccos(np.dot(current_heading, next_heading) / (LA.norm(current_heading)*LA.norm(next_heading)))
+        norm_v = np.cross(current_heading,next_heading)
+        if norm_v > 0:
+            yaw += delta_psi
+        else:
+            yaw -= delta_psi
+
+        if yaw > np.pi:
+            yaw = yaw - 2*np.pi
+
+        # print next_heading, current_heading, "yaw", yaw*180/np.pi, 'pos', pos
+        current_heading = next_heading
+        yawdot = delta_psi / 0.005
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
 def get_poly_cc(n, k, t):

@@ -12,7 +12,7 @@ class TestQuadcopterMethod(unittest.TestCase):
         frame = quadcopter.world_frame()
         # let's simply test the dimension of output matrix for now
         self.assertEqual((3,6), frame.shape)
-    
+
     def test_state_dot(self):
         pos = (0,0,0)
         attitude = [0,0,np.pi/6]
@@ -35,13 +35,13 @@ class TestQuadcopterMethod(unittest.TestCase):
         dt = 0.01
         F = 0.0
         quadcopter.update(dt, F, M)
-    
+
     def test_attitude(self):
         pos = (0,0,0)
-        attitude = [0,0,np.pi/6]
+        attitude = [0,0,np.pi/2]
         quadcopter = Quadcopter(pos, attitude)
         attitude = quadcopter.attitude()
-        print "attitude", attitude 
+        print "attitude", attitude
 
 if __name__ == '__main__':
     unittest.main()
