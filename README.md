@@ -3,7 +3,7 @@ Quadcopter 3D Simulator
 
 The project simulates a quadcopter in 3D environment. It contains a basic quadcopter dynamics model, hover controller, trajectory generator, visualisation toolkit and a top level scheduler which runs each module at a specific rate.
 
-![Alt text](https://github.com/hbd730/quadcopter-simulation/blob/master/sim.gif)
+![alt tag](https://github.com/hbd730/quadcopter-simulation/blob/master/sim.gif)
 
 Motivation
 -----
