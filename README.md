@@ -19,8 +19,7 @@ python runsim.py
 
 Future Work
 -----
-1. Calculate heading of the quadcopter for each desired state of helix trajectory. So it always follows the tangent of the curve.
-2. Make heading visual marker on the quadcopter.
+1. add sensor noise model
 
 Contribution
 -----
