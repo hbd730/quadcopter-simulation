@@ -19,7 +19,9 @@ python runsim.py
 
 Future Work
 -----
-1. add sensor noise model
+1. add sensor noise model, wind.
+2. add sensor fusion.i.e EKF,UKF
+3. reinforment learning.
 
 Contribution
 -----
