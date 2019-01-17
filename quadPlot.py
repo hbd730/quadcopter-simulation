@@ -15,7 +15,7 @@ import sys
 history = np.zeros((500,3))
 count = 0
 
-def plot_quad_3d(waypoints, args=()):
+def plot_quad_3d(waypoints, init_pos, args=()):
     fig = plt.figure()
     ax = fig.add_axes([0, 0, 1, 1], projection='3d')
     ax.plot([], [], [], '-', c='cyan')[0]
@@ -23,7 +23,10 @@ def plot_quad_3d(waypoints, args=()):
     ax.plot([], [], [], '-', c='blue', marker='o', markevery=2)[0]
     ax.plot([], [], [], '.', c='red', markersize=4)[0]
     ax.plot([], [], [], '.', c='blue', markersize=2)[0]
-    set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,8))
+    #set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,8))
+    set_limit2(waypoints, init_pos)
+
+    set_ax_names("x","y","z")
     plot_waypoints(waypoints)
     an = animation.FuncAnimation(fig, _callback, fargs = args, init_func=None,
             frames=400, interval=10, blit=False)
@@ -44,6 +47,32 @@ def set_limit(x, y, z):
     ax.set_xlim(x)
     ax.set_ylim(y)
     ax.set_zlim(z)
+
+def set_limit2(waypoints, pos):
+    """
+        Set the drawing limits based on the waypoints 
+        the quadrotor should fly and start point.
+
+    """
+    ax = plt.gca()
+    x_min = min(pos[0], min(waypoints[:,0]))
+    x_max = max(pos[0], max(waypoints[:,0]))
+    ax.set_xlim(x_min,x_max)
+
+    y_min = min(pos[1], min(waypoints[:,1]))
+    y_max = max(pos[1], max(waypoints[:,1]))
+    ax.set_ylim(y_min,y_max)
+
+    z_min = min(pos[2], min(waypoints[:,2]))
+    z_max = max(pos[2], max(waypoints[:,2]))
+    ax.set_zlim(z_min,z_max)
+
+def set_ax_names(x, y, z):
+    ax = plt.gca()
+    ax.set_xlabel(x)
+    ax.set_ylabel(y)
+    ax.set_zlabel(z)
+
 
 def set_frame(frame):
     # convert 3x6 world_frame matrix into three line_data objects which is 3x2 (row:point index, column:x,y,z)

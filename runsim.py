@@ -29,17 +29,24 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     time[0] += dt
 
 def main():
+    # define initial conditions
     pos = (0.5,0,0)
     attitude = (0,0,0)
+    # create new quadrotor
     quadcopter = Quadcopter(pos, attitude)
+
     sched = scheduler.Scheduler()
-    waypoints = trajGen3D.get_helix_waypoints(0, 9)
+    # Generate a trajectory with 9 waypoints
+    waypoints = trajGen3D.get_leminiscata_waypoints(0, 9)
+    # Get coefficients of 8 degree polinomial that represents the 
+    # continuos trajectory that drone will follow in space
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
+    # 
     sched.add_task(attitudeControl, dt, (quadcopter,time,waypoints,coeff_x,coeff_y,coeff_z))
     kEvent_Render = sched.add_event(render, (quadcopter,))
 
     try:
-        plt.plot_quad_3d(waypoints, (sched, kEvent_Render))
+        plt.plot_quad_3d(waypoints, pos, (sched, kEvent_Render))
     except KeyboardInterrupt:
         print ("attempting to close threads.")
         sched.stop()
@@ -47,3 +54,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
