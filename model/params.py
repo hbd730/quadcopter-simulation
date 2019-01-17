@@ -15,7 +15,7 @@ I = np.array([(0.00025, 0, 2.55e-6),
 
 invI = np.linalg.inv(I)
 arm_length = 0.086 # meter
-height = 0.05
+height = 0.00
 minF = 0.0
 maxF = 2.0 * mass * g
 L = arm_length

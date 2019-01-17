@@ -24,7 +24,7 @@ def render(quad):
 
 def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
-    F, M = controller.run(quad, desired_state)
+    F, M = controller.run_LQR(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -37,7 +37,7 @@ def main():
 
     sched = scheduler.Scheduler()
     # Generate a trajectory with 9 waypoints
-    waypoints = trajGen3D.get_leminiscata_waypoints(0, 9)
+    waypoints = trajGen3D.get_poly_waypoints(0, 9)
     # Get coefficients of 8 degree polinomial that represents the 
     # continuos trajectory that drone will follow in space
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
