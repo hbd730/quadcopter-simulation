@@ -1,0 +1,6 @@
+*.pyc
+model/*.pyc
+test/*.pyc
+utils/*.pyc
+
+
