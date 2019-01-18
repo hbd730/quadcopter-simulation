@@ -15,7 +15,10 @@ import sys
 history = np.zeros((500,3))
 count = 0
 
-def plot_quad_3d(waypoints, args=()):
+def plot_quad_3d(waypoints, get_world_frame):
+    """
+    get_world_frame is a function which return the "next" world frame to be drawn
+    """
     fig = plt.figure()
     ax = fig.add_axes([0, 0, 1, 1], projection='3d')
     ax.plot([], [], [], '-', c='cyan')[0]
@@ -25,8 +28,12 @@ def plot_quad_3d(waypoints, args=()):
     ax.plot([], [], [], '.', c='blue', markersize=2)[0]
     set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,8))
     plot_waypoints(waypoints)
-    an = animation.FuncAnimation(fig, _callback, fargs = args, init_func=None,
-            frames=400, interval=10, blit=False)
+    an = animation.FuncAnimation(fig,
+                                 anim_callback,
+                                 fargs=(get_world_frame,),
+                                 init_func=None,
+                                 frames=400, interval=10, blit=False)
+
     if len(sys.argv) > 1 and sys.argv[1] == 'save':
         print "saving"
         an.save('sim.gif', dpi=80, writer='imagemagick', fps=60)
@@ -44,6 +51,10 @@ def set_limit(x, y, z):
     ax.set_xlim(x)
     ax.set_ylim(y)
     ax.set_zlim(z)
+
+def anim_callback(i, get_world_frame):
+    frame = get_world_frame(i)
+    set_frame(frame)
 
 def set_frame(frame):
     # convert 3x6 world_frame matrix into three line_data objects which is 3x2 (row:point index, column:x,y,z)
@@ -66,10 +77,3 @@ def set_frame(frame):
     lines[-1].set_data(xline, yline)
     lines[-1].set_3d_properties(zline)
     # ax.plot3D(xline, yline, zline, 'blue')
-
-def _callback(i, sched, id):
-    # forward the event from GUI thread to scheduler threadA
-    # do the actual rendering in _render method
-    # start scheduler after we get the first frame so that we can see the initial state
-    sched.start()
-    sched.postEvent(id)

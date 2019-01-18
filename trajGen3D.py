@@ -130,7 +130,7 @@ def MST(waypoints):
     time, returns a [8N,1] coeffitients matrix for the N+1 waypoints.
 
     1.The Problem
-    Generate a full trajectory across N+1 waypoint is made of N polynomial line segment.
+    Generate a full trajectory across N+1 waypoint made of N polynomial line segment.
     Each segment is defined as 7 order polynomial defined as follow:
     Pi = ai_0 + ai1*t + ai2*t^2 + ai3*t^3 + ai4*t^4 + ai5*t^5 + ai6*t^6 + ai7*t^7
 
