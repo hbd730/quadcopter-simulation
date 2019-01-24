@@ -28,8 +28,11 @@ def main():
     pos = (0.5,0,0)
     attitude = (0,0,0)
     quadcopter = Quadcopter(pos, attitude)
-    waypoints = trajGen3D.get_helix_waypoints(0, 9)
+    waypoints = trajGen3D.get_helix_waypoints(0.0, 9.0)
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
+    print("coeff_x : {} len {}".format(coeff_x,len(coeff_x)))
+    print("coeff Y : {} len {}".format(coeff_y,len(coeff_y)))
+    #print("coeff_z : {} len {}".format(coeff_z,len(coeff_z)))
 
     def control_loop(i):
         for _ in range(control_iterations):

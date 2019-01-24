@@ -31,11 +31,18 @@ def run(quad, des_state):
     x_dot, y_dot, z_dot = quad.velocity()
     phi, theta, psi = quad.attitude()
     p, q, r = quad.omega()
+
     des_x, des_y, des_z = des_state.pos
     des_x_dot, des_y_dot, des_z_dot = des_state.vel
     des_x_ddot, des_y_ddot, des_z_ddot = des_state.acc
     des_psi = des_state.yaw
     des_psi_dot = des_state.yawdot
+
+    #print("pos {}".format(des_state.pos))
+    #print("vel {}".format(des_state.vel))
+    #print("acc {}".format(des_state.acc))
+    #print("yaw {}".format(des_state.yaw))
+    #print("yawdot {}".format(des_state.yawdot))
     # Commanded accelerations
     commanded_r_ddot_x = des_x_ddot + k_d_x * (des_x_dot - x_dot) + k_p_x * (des_x - x)
     commanded_r_ddot_y = des_y_ddot + k_d_y * (des_y_dot - y_dot) + k_p_y * (des_y - y)
@@ -54,4 +61,5 @@ def run(quad, des_state):
                    k_p_theta * (des_theta - theta) + k_d_theta * (q_des - q),
                    k_p_psi * (des_psi - psi) + k_d_psi * (r_des - r)]]).T
 
+    #print(F,M)
     return F, M
