@@ -18,7 +18,7 @@ def get_helix_waypoints(t, n):
     """ The function generate n helix waypoints from the given time t
         output waypoints shape is [n, 3]
     """
-    waypoints_t = np.linspace(t, t + 2*np.pi, n)
+    waypoints_t = np.linspace(0, t, n)
     x = 0.5*np.cos(waypoints_t)
     y = 0.5*np.sin(waypoints_t)
     z = waypoints_t
@@ -31,8 +31,6 @@ def get_MST_coefficients(waypoints):
     coeff_y = MST(waypoints[:,1]).transpose()[0]
     coeff_z = MST(waypoints[:,2]).transpose()[0]
     return (coeff_x, coeff_y, coeff_z)
-
-
 
 def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     """ The function takes known number of waypoints and time, then generates a
@@ -131,13 +129,20 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
             pass
 
         # dirty hack, quadcopter's yaw range represented by quaternion is [-pi, pi]
-        if yaw > np.pi:
+        while yaw > np.pi:
             yaw = yaw - 2*np.pi
 
         # print next_heading, current_heading, "yaw", yaw*180/np.pi, 'pos', pos
         current_heading = next_heading
         #print(current_heading)
         yawdot = delta_psi / 0.005 # dt is control period
+        max_yawdot = 5.0 #rad/s
+        if(abs(yawdot) > max_yawdot):
+            yawdot = (yawdot/abs(yawdot))*5.0 # make it 5rad/s with appropriate direction
+        
+        yaw = 0
+        yawdot = 0
+        print (" yaw: {}  yawdot: {}".format(yaw,yawdot))
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
 def get_poly_cc(n, k, t):

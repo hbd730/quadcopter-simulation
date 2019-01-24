@@ -24,8 +24,8 @@ def plot_quad_3d(waypoints, get_world_frame):
     ax.plot([], [], [], '-', c='cyan')[0]
     ax.plot([], [], [], '-', c='red')[0]
     ax.plot([], [], [], '-', c='blue', marker='o', markevery=2)[0]
-    ax.plot([], [], [], '.', c='green', markersize=4)[0]
-    ax.plot([], [], [], '.', c='k', markersize=2)[0]
+    ax.plot([], [], [], '.', c='red', markersize=4)[0]
+    ax.plot([], [], [], '.', c='blue', markersize=2)[0]
     set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,8))
     plot_waypoints(waypoints)
     an = animation.FuncAnimation(fig,
