@@ -24,6 +24,47 @@ def get_helix_waypoints(t, n):
     z = waypoints_t
 
     return np.stack((x, y, z), axis=-1)
+    
+def get_poly_waypoints(t,n):
+    """ The function generate n waypoints from a polynomial at given t.
+        The polynomial is 
+            x = k1*t^2
+            y = k1*t^3
+            z = k2*t
+        Output waypoints shape is [n, 3]
+    """
+    waypoints_t = np.linspace(0, t + 4*np.pi, n)
+    k1 = 0.0
+    k2 = 0.0
+    #x = (k1*waypoints_t)**2
+    #y = (k1*waypoints_t)**3
+    #z = k2*waypoints_t
+    x = k1*np.ones_like(waypoints_t)
+    y = k2*np.ones_like(waypoints_t)
+    z = waypoints_t
+
+
+    return np.stack((x, y, z), axis=-1)
+
+def get_leminiscata_waypoints(t,n):
+    """ The function generate n waypoints from a leminiscata at given t.
+        The leminiscata is 
+            x = k1 * cos(wt/2)
+            y = k1 * sin(wt)
+            z = k2 * t
+        Output waypoints shape is [n, 3]
+    """
+    waypoints_t = np.linspace(0, t, n)
+    
+    k1 = 0.5
+    k2 = 0.5#
+    w = 0.7
+    
+    x = k1*np.cos(w*waypoints_t/2.0)
+    y = k1*np.sin(w*waypoints_t)
+    z = k2*waypoints_t
+
+    return np.stack((x, y, z), axis=-1)
 
 def get_MST_coefficients(waypoints):
     # generate MST coefficients for each segment, coeff is now 1D array [64,]
