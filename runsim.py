@@ -6,7 +6,9 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 from quadPlot import plot_quad_3d
-import controller
+from control import lqr_controller as lqr
+from control import pid_controller as pid
+
 import trajGen
 import trajGen3D
 from model.quadcopter import Quadcopter
@@ -20,7 +22,7 @@ time = [0.0]
 
 def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
-    F, M = controller.run(quad, desired_state)
+    F, M = lqr.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -28,7 +30,7 @@ def main():
     pos = (0.5,0,0)
     attitude = (0,0,0)
     quadcopter = Quadcopter(pos, attitude)
-    waypoints = trajGen3D.get_helix_waypoints(0, 9)
+    waypoints = trajGen3D.get_helix_waypoints(6, 9.0)
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
 
     def control_loop(i):

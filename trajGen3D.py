@@ -12,16 +12,57 @@ from numpy import linalg as LA
 
 DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
 yaw = 0.0
-current_heading = np.zeros(2)
+current_heading = np.array([1.0,0.0]) #heading vector should always be unitary vector. [0,0] vector has no heading!
 
 def get_helix_waypoints(t, n):
     """ The function generate n helix waypoints from the given time t
         output waypoints shape is [n, 3]
     """
-    waypoints_t = np.linspace(t, t + 2*np.pi, n)
+    waypoints_t = np.linspace(0, t, n)
     x = 0.5*np.cos(waypoints_t)
     y = 0.5*np.sin(waypoints_t)
     z = waypoints_t
+
+    return np.stack((x, y, z), axis=-1)
+    
+def get_poly_waypoints(t,n):
+    """ The function generate n waypoints from a polynomial at given t.
+        The polynomial is 
+            x = k1*t^2
+            y = k1*t^3
+            z = k2*t
+        Output waypoints shape is [n, 3]
+    """
+    waypoints_t = np.linspace(0, t + 4*np.pi, n)
+    k1 = 0.0
+    k2 = 0.0
+    #x = (k1*waypoints_t)**2
+    #y = (k1*waypoints_t)**3
+    #z = k2*waypoints_t
+    x = k1*np.ones_like(waypoints_t)
+    y = k2*np.ones_like(waypoints_t)
+    z = waypoints_t
+
+
+    return np.stack((x, y, z), axis=-1)
+
+def get_leminiscata_waypoints(t,n):
+    """ The function generate n waypoints from a leminiscata at given t.
+        The leminiscata is 
+            x = k1 * cos(wt/2)
+            y = k1 * sin(wt)
+            z = k2 * t
+        Output waypoints shape is [n, 3]
+    """
+    waypoints_t = np.linspace(0, t, n)
+    
+    k1 = 0.5
+    k2 = 0.5#
+    w = 0.7
+    
+    x = k1*np.cos(w*waypoints_t/2.0)
+    y = k1*np.sin(w*waypoints_t)
+    z = k2*waypoints_t
 
     return np.stack((x, y, z), axis=-1)
 
@@ -38,6 +79,10 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     the desired state associated with the next waypont for the time t.
     waypoints is [N,3] matrix, waypoints = [[x0,y0,z0]...[xn,yn,zn]].
     v is velocity in m/s
+
+    The heading is computed such that 1) the drone is always pointing tangent to the
+    computed trajectory (so it is computed from velocity vector) and 2) 
+    is always magnitude 1. 
     """
     global yaw
     global current_heading
@@ -61,7 +106,16 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     if t == 0:
         pos = waypoints[0]
         t0 = get_poly_cc(8, 1, 0)
-        current_heading = np.array([coeff_x[0:8].dot(t0), coeff_y[0:8].dot(t0)]) * (1.0 / T[0])
+
+        # get X-Y plane project of velocity vector ( this vector is tangent to curve )
+        v_proj = np.array([coeff_x[0:8].dot(t0), coeff_y[0:8].dot(t0)])
+        if(LA.norm(v_proj) == 0.0):
+            #  if velocity vector is of zero magnitude there should be no change in heading!
+            pass
+        else:
+            current_heading = v_proj/LA.norm(v_proj)
+            
+
     # stay hover at the last waypoint position
     elif t > S[-1]:
         pos = waypoints[-1]
@@ -83,24 +137,53 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         acc = np.array([coeff_x[start:end].dot(t2), coeff_y[start:end].dot(t2), coeff_z[start:end].dot(t2)]) * (1.0 / T[t_index]**2)
 
         # calculate desired yaw and yaw rate
-        next_heading = np.array([vel[0], vel[1]])
+
+        v_proj = np.array([vel[0], vel[1]])
+
+        if( LA.norm(v_proj) == 0.0):
+            # if velocity vector is zero, again there should be no change in heading
+            next_heading = current_heading
+        else:
+            next_heading = v_proj/LA.norm(v_proj)
+
+        """
+        try :
+            #current_heading = v_proj/LA.norm(v_proj) #* (1.0 / T[0])  #np.array([coeff_x[0:8].dot(t0), coeff_y[0:8].dot(t0)]) * (1.0 / T[0])
+            next_heading = v_proj/LA.norm(v_proj)
+        except ZeroDivisionError:
+            # velocity vector magnitude was zero so there should be no change in heading!
+            next_heading = current_heading
+        """    
+
         # angle between current vector with the next heading vector
+        # from   a * b  = |a|*|b|cos(angle)
         delta_psi = np.arccos(np.dot(current_heading, next_heading) / (LA.norm(current_heading)*LA.norm(next_heading)))
         # cross product allow us to determine rotating direction
         norm_v = np.cross(current_heading,next_heading)
 
         if norm_v > 0:
             yaw += delta_psi
-        else:
+        elif norm_v < 0:
             yaw -= delta_psi
+        else:
+            # normv = 0! if there is no change in yaw, do not modify it!
+            pass
 
         # dirty hack, quadcopter's yaw range represented by quaternion is [-pi, pi]
-        if yaw > np.pi:
+        while yaw > np.pi:
             yaw = yaw - 2*np.pi
 
         # print next_heading, current_heading, "yaw", yaw*180/np.pi, 'pos', pos
         current_heading = next_heading
+        #print(current_heading)
         yawdot = delta_psi / 0.005 # dt is control period
+        max_yawdot = 5.0 #rad/s
+        if(abs(yawdot) > max_yawdot):
+            yawdot = (yawdot/abs(yawdot))*5.0 # make it 5rad/s with appropriate direction
+        
+        yaw = 0
+        yawdot = 0
+        print (" yaw: {}  yawdot: {}".format(yaw,yawdot))
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
 def get_poly_cc(n, k, t):

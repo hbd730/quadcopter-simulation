@@ -106,7 +106,7 @@ class Quadcopter:
         L = params.arm_length
         r = params.r
         prop_thrusts = params.invA.dot(np.r_[np.array([[F]]), M])
-        prop_thrusts_clamped = np.maximum(np.minimum(prop_thrusts, params.maxF/4), params.minF/4)
+        prop_thrusts_clamped = np.maximum(np.minimum(prop_thrusts, params.maxF/4.0), params.minF/4.0)
         F = np.sum(prop_thrusts_clamped)
         M = params.A[1:].dot(prop_thrusts_clamped)
         self.state = integrate.odeint(self.state_dot, self.state, [0,dt], args = (F, M))[1]
