@@ -35,7 +35,7 @@ def plot_quad_3d(waypoints, get_world_frame):
                                  frames=400, interval=10, blit=False)
 
     if len(sys.argv) > 1 and sys.argv[1] == 'save':
-        print "saving"
+        print("saving")
         an.save('sim.gif', dpi=80, writer='imagemagick', fps=60)
     else:
         plt.show()

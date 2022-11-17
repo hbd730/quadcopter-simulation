@@ -94,7 +94,7 @@ class TestGenerateTrajectory(unittest.TestCase):
         self.assertEqual(desired_state.vel.shape, (3,))
         self.assertEqual(desired_state.acc.shape, (3,))
         des_x_dot, des_y_dot, des_z_dot = desired_state.vel
-        print "desired_state", desired_state
+        print("desired_state", desired_state)
 
 if __name__ == '__main__':
     unittest.main()

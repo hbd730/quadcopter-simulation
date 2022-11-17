@@ -25,7 +25,7 @@ class TestQuadcopterMethod(unittest.TestCase):
         dt = 0.01
 
         s_dot = quadcopter.state_dot(quadcopter.state,dt,F,M)
-        print "s_dot", s_dot
+        print("s_dot", s_dot)
 
     def test_update(self):
         pos = (0,0,0)
@@ -41,7 +41,7 @@ class TestQuadcopterMethod(unittest.TestCase):
         attitude = [0,0,np.pi/2]
         quadcopter = Quadcopter(pos, attitude)
         attitude = quadcopter.attitude()
-        print "attitude", attitude
+        print("attitude", attitude)
 
 if __name__ == '__main__':
     unittest.main()
