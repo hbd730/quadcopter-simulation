@@ -13,9 +13,9 @@ class TestController(unittest.TestCase):
         time = 0.0
         des_state = trajGen.genLine(time)
         F, M = controller.run(quad, des_state)
-        print "des_state", des_state
-        print "F", F
-        print "M", M
+        print("des_state", des_state)
+        print("F", F)
+        print("M", M)
 
 if __name__ == '__main__':
     unittest.main()

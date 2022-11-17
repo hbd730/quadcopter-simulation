@@ -16,7 +16,7 @@ class TestQuaternionMehods(unittest.TestCase):
         expected_v = np.array(x)
         expected_theta = np.pi/2
         actual_v, actual_theta = q.as_v_theta()
-        print actual_v, actual_theta, expected_v
+        print(actual_v, actual_theta, expected_v)
         self.assertTrue(np.array_equal(expected_v, actual_v))
         self.assertEqual(expected_theta, actual_theta)
 

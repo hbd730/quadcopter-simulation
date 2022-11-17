@@ -6,8 +6,8 @@ from context import trajGen3D
 def get_full_trajectory():
     T = np.linspace(0, 100, 1000)
     waypoints = trajGen3D.get_helix_waypoints(0, 9)
-    print "T", T
-    print "waypoints", waypoints
+    print("T", T)
+    print("waypoints", waypoints)
 
     full_traj = np.zeros((T.size,3))
     for i, t in enumerate(T):

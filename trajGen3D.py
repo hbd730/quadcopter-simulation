@@ -98,7 +98,7 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         if yaw > np.pi:
             yaw = yaw - 2*np.pi
 
-        # print next_heading, current_heading, "yaw", yaw*180/np.pi, 'pos', pos
+        # print(next_heading, current_heading, "yaw", yaw*180/np.pi, 'pos', pos
         current_heading = next_heading
         yawdot = delta_psi / 0.005 # dt is control period
     return DesiredState(pos, vel, acc, yaw, yawdot)
